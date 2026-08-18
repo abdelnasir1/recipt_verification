@@ -26,11 +26,10 @@ def load_reference() -> np.ndarray:
 
 REF_IMG = load_reference()
 
-# Initialize PaddleOCR - removed show_log parameter (not supported in newer versions)
+# Initialize PaddleOCR - removed deprecated parameters
 ocr = PaddleOCR(
     use_angle_cls=False,
     lang=settings.ocr_lang,
-    use_gpu=settings.use_gpu,
 )
 
 def find_after(label: str, lines: list[str], threshold: int = 85) -> Optional[str]:
