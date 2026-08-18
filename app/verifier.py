@@ -90,7 +90,7 @@ def verify_receipt(
     if score < ssim_threshold:
         return False, f"image quality too low or not a receipt (ssim={score:.3f})"
 
-    # OCR
+    # OCR (cls parameter removed - no longer supported)
     result = ocr.ocr(image_bytes)
     if not result or not result[0]:
         return False, "OCR failed – no text found"

@@ -1,8 +1,7 @@
 import os
-import base64
 import logging
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from supabase import create_client, Client
 from typing import Optional
@@ -32,13 +31,6 @@ app = FastAPI(
 supabase: Client = create_client(settings.supabase_url, settings.supabase_key)
 
 # Request/Response Models
-class VerifyByImageBytesRequest(BaseModel):
-    """Direct verification with image data"""
-    image_base64: str = Field(..., description="Base64 encoded image")
-    account_number: str = Field(..., description="Account number to verify")
-    amount: float = Field(..., description="Expected amount")
-    payment_id: Optional[str] = Field(None, description="Optional payment record ID for database update")
-
 class VerifyByUrlRequest(BaseModel):
     """Verification using image URL from Supabase Storage"""
     image_path: str = Field(..., description="Path to image in Supabase storage")
@@ -55,76 +47,6 @@ class VerificationResponse(BaseModel):
     account: str = Field(..., description="Account verified")
     timestamp: str = Field(..., description="ISO timestamp of verification")
     payment_id: Optional[str] = Field(None, description="Payment ID if provided")
-
-@app.get("/health")
-def health():
-    """Health check endpoint"""
-    return {"status": "ok", "service": "receipt-verifier", "version": settings.app_version}
-
-@app.post("/verify/image", response_model=VerificationResponse)
-async def verify_with_image_bytes(request: VerifyByImageBytesRequest):
-    """
-    Verify receipt using base64 encoded image data
-    
-    Args:
-        request: Contains base64 image, account number, amount, and optional payment_id
-    
-    Returns:
-        VerificationResponse with status, reason, and verification details
-    """
-    try:
-        # Decode base64 image
-        try:
-            image_bytes = base64.b64decode(request.image_base64)
-        except Exception as e:
-            logger.error(f"Failed to decode base64 image: {e}")
-            raise HTTPException(400, "Invalid base64 image encoding")
-
-        logger.info(f"Verifying receipt for account {request.account_number}, amount {request.amount}")
-
-        # Run verification
-        success, reason = verify_receipt(
-            image_bytes,
-            request.account_number,
-            request.amount,
-            ssim_threshold=settings.ssim_threshold
-        )
-
-        status = "success" if success else "failed"
-        timestamp = datetime.utcnow().isoformat()
-
-        response = VerificationResponse(
-            status=status,
-            verified=success,
-            reason=reason,
-            amount=request.amount,
-            account=request.account_number,
-            timestamp=timestamp,
-            payment_id=request.payment_id
-        )
-
-        # Update database if payment_id provided and UPDATE_DATABASE is enabled
-        if request.payment_id and os.getenv("UPDATE_DATABASE", "true").lower() == "true":
-            try:
-                table_name = os.getenv("DATABASE_TABLE", "payments")
-                supabase.table(table_name).update({
-                    "status": status,
-                    "reason": reason,
-                    "verified_at": timestamp,
-                }).eq("id", request.payment_id).execute()
-                logger.info(f"Updated database record {request.payment_id} with status {status}")
-            except Exception as e:
-                logger.error(f"Failed to update database: {e}")
-                # Don't fail the response if database update fails
-
-        logger.info(f"Verification complete: {status} - {reason if reason else 'Receipt valid'}")
-        return response
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Verification error: {e}", exc_info=True)
-        raise HTTPException(500, f"Verification failed: {str(e)}")
 
 @app.post("/verify/storage", response_model=VerificationResponse)
 async def verify_with_storage_url(request: VerifyByUrlRequest):
