@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  supabase:
+    # This is a simplified setup - for production use full Dokploy Supabase setup
+    image: supabase/postgres:15-1.42.4
+    container_name: supabase_db
+    environment:
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+    networks:
+      - receipt_network
+
+  receipt-verifier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: receipt_verifier
+    environment:
+      SUPABASE_URL: http://supabase:5432  # Use service name for internal network
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      STORAGE_BUCKET: receipts
+      OCR_LANGUAGE: en
+      USE_GPU: "false"
+      UPDATE_DATABASE: "true"
+      DATABASE_TABLE: payments
+      DEBUG: "false"
+      PORT: 8000
+      HOST: 0.0.0.0
+      WORKERS: 1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - supabase
+    networks:
+      - receipt_network
+    restart: unless-stopped
+    volumes:
+      - ./reference_receipt.jpg:/app/reference_receipt.jpg
+
+volumes:
+  supabase_data:
+
+networks:
+  receipt_network:
+    driver: bridge
