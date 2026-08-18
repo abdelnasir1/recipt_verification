@@ -1,0 +1,11 @@
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+opencv-python-headless==4.10.0.84
+scikit-image==0.24.0
+paddlepaddle==2.6.2
+paddleocr==2.9.1
+rapidfuzz==3.10.1
+supabase==2.10.0
+python-multipart==0.0.17
+httpx==0.28.1
+numpy==1.26.4
