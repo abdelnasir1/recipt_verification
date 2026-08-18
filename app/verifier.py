@@ -10,9 +10,11 @@ from paddleocr import PaddleOCR
 from rapidfuzz import fuzz
 from skimage.metrics import structural_similarity as ssim
 
+from .config import settings
+
 # Load reference receipt once at startup
-REFERENCE_PATH = os.getenv("REFERENCE_IMAGE", "reference_receipt.jpg")
-REFERENCE_SIZE = (256, 256)
+REFERENCE_PATH = settings.reference_image
+REFERENCE_SIZE = settings.reference_size
 
 def load_reference() -> np.ndarray:
     img = cv2.imread(REFERENCE_PATH, cv2.IMREAD_GRAYSCALE)
@@ -24,11 +26,11 @@ def load_reference() -> np.ndarray:
 
 REF_IMG = load_reference()
 
+# Initialize PaddleOCR - removed show_log parameter (not supported in newer versions)
 ocr = PaddleOCR(
     use_angle_cls=False,
-    lang="en",                    # change to "ar" if needed
-    show_log=False,
-    use_gpu=False,                # set True only if you have GPU + CUDA
+    lang=settings.ocr_lang,
+    use_gpu=settings.use_gpu,
 )
 
 def find_after(label: str, lines: list[str], threshold: int = 85) -> Optional[str]:
