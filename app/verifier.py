@@ -91,7 +91,7 @@ def verify_receipt(
         return False, f"image quality too low or not a receipt (ssim={score:.3f})"
 
     # OCR
-    result = ocr.ocr(image_bytes, cls=False)
+    result = ocr.ocr(image_bytes)
     if not result or not result[0]:
         return False, "OCR failed – no text found"
 

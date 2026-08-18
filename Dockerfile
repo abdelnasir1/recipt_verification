@@ -5,13 +5,15 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
 
-# System dependencies for OpenCV + Paddle
+# System dependencies for OpenCV + Paddle + GNU OpenMP
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender1 \
+    libgomp1 \
+    libopenblas0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
