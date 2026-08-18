@@ -7,8 +7,8 @@ from pydantic import BaseModel, Field
 from supabase import create_client, Client
 from typing import Optional
 
-from config import settings
-from verifier import verify_receipt
+from .config import settings
+from .verifier import verify_receipt
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
