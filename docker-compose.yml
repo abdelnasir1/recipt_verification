@@ -20,7 +20,6 @@ services:
       WORKERS: 1
     ports:
       - "8000:8000"
-    restart: unless-stopped
     volumes:
       - ./reference_receipt.jpg:/app/reference_receipt.jpg
 
