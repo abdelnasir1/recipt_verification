@@ -54,12 +54,13 @@ async def verify_with_storage_url(request: VerifyByUrlRequest):
 
         # Download image from Supabase Storage
         try:
-            image_bytes = supabase.storage.from_(settings.storage_bucket).download(request.image_path)
+            image_bytes = supabase.storage.from_('receipts').download(request.image_path)
         except Exception as e:
             logger.error(f"Failed to download image from storage: {e}")
             raise HTTPException(400, f"Failed to download image from storage: {e}")
 
         logger.info(f"Verifying receipt for account {request.account_number}, amount {request.amount}")
+
 
         # Run verification
         success, reason = verify_receipt(

@@ -8,7 +8,7 @@ class Settings:
 
     # OCR Configuration
     reference_image: str = os.getenv("REFERENCE_IMAGE", "reference_receipt.jpg")
-    reference_size: tuple = (256, 256)
+    reference_size: tuple = (3000  ,4000)
     ocr_lang: str = os.getenv("OCR_LANGUAGE", "en")  # "ar" for Arabic, "en" for English
     use_gpu: bool = os.getenv("USE_GPU", "false").lower() == "true"
 
