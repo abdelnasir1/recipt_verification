@@ -13,18 +13,11 @@ from .verifier import verify_receipt
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Validate configuration
-try:
-    settings.validate()
-except RuntimeError as e:
-    logger.error(f"Configuration error: {e}")
-    raise
-
 # Initialize FastAPI
 app = FastAPI(
     title=settings.app_title,
     version=settings.app_version,
-    description="Receipt verification service for Dokploy"
+    description="Receipt verification"
 )
 
 # Initialize Supabase client
@@ -52,12 +45,9 @@ class VerificationResponse(BaseModel):
 async def verify_with_storage_url(request: VerifyByUrlRequest):
     """
     Verify receipt using image from Supabase Storage
-    
-    Args:
-        request: Contains storage path, account number, amount, and optional payment_id
-    
-    Returns:
-        VerificationResponse with status, reason, and verification details
+    Args: storage path, account number, amount, and optional payment_id
+    Returns: VerificationResponse with status, reason, and verification details
+
     """
     try:
         logger.info(f"Downloading image from storage: {request.image_path}")

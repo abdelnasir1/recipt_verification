@@ -1,11 +1,5 @@
-"""Configuration settings for Receipt Verification App"""
-
 import os
-from typing import Optional
-
-
 class Settings:
-    """Application settings loaded from environment variables"""
 
     # Supabase Configuration
     supabase_url: str = os.getenv("SUPABASE_URL", "")
@@ -32,13 +26,6 @@ class Settings:
     host: str = os.getenv("HOST", "0.0.0.0")
     port: int = int(os.getenv("PORT", "8000"))
 
-    def validate(self) -> bool:
-        """Validate required configuration"""
-        if not self.supabase_url:
-            raise RuntimeError("SUPABASE_URL is required")
-        if not self.supabase_key:
-            raise RuntimeError("SUPABASE_SERVICE_ROLE_KEY is required")
-        return True
 
     def __repr__(self) -> str:
         """String representation (redacts sensitive data)"""
@@ -49,6 +36,4 @@ class Settings:
             f"use_gpu={self.use_gpu})"
         )
 
-
-# Global settings instance
 settings = Settings()

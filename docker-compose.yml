@@ -10,7 +10,7 @@ services:
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
       STORAGE_BUCKET: receipts
-      OCR_LANGUAGE: en
+      OCR_LANGUAGE: ar
       USE_GPU: "false"
       UPDATE_DATABASE: "true"
       DATABASE_TABLE: payments
