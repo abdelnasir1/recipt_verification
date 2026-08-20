@@ -21,7 +21,7 @@ class VerifyByUrlRequest(BaseModel):
     """Receipt image path and payment row identifier."""
     model_config = ConfigDict(extra="forbid")
 
-    image_url: str = Field(..., min_length=1, description="Path to image in Supabase storage")
+    image_url: str = Field(..., min_length=1, description="Supabase public image URL or storage path")
     payment_id: str = Field(..., min_length=1, description="Payment record ID")
 
 @app.post("/verify/storage", status_code=200, response_model=None)
