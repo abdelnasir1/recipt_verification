@@ -23,7 +23,7 @@ def _storage_path(image_url: str) -> str:
         return image_url.lstrip("/")
 
     path_parts = [unquote(part) for part in parsed.path.split("/") if part]
-    marker = ["storage", "v1", "object", "public"]
+    marker = ["storage", "v1", "object", "public" ,"receipts"]
     try:
         marker_index = next(
             index for index in range(len(path_parts) - len(marker) + 1)
