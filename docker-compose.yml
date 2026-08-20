@@ -1,6 +1,12 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
   receipt-verifier:
     build:
       context: .
@@ -18,8 +24,37 @@ services:
       PORT: 8000
       HOST: 0.0.0.0
       WORKERS: 1
+      REDIS_URL: redis://redis:6379/0
+      ACCOUNT_NUMBER: ${ACCOUNT_NUMBER:?ACCOUNT_NUMBER is required}
+      AMOUNT: ${AMOUNT:?AMOUNT is required}
+    depends_on:
+      - redis
     ports:
       - "8000:8000"
     volumes:
       - ./reference_receipt.jpg:/app/reference_receipt.jpg
+
+  receipt-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: receipt_verifier_worker
+    command: celery -A app.tasks worker --loglevel=info --concurrency=1
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      STORAGE_BUCKET: receipts
+      OCR_LANGUAGE: ar
+      USE_GPU: "false"
+      DATABASE_TABLE: payments
+      REDIS_URL: redis://redis:6379/0
+      ACCOUNT_NUMBER: ${ACCOUNT_NUMBER:?ACCOUNT_NUMBER is required}
+      AMOUNT: ${AMOUNT:?AMOUNT is required}
+    depends_on:
+      - redis
+    volumes:
+      - ./reference_receipt.jpg:/app/reference_receipt.jpg
+
+volumes:
+  redis_data:
 

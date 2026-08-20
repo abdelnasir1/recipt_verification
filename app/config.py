@@ -5,6 +5,9 @@ class Settings:
     supabase_url: str = os.getenv("SUPABASE_URL", "")
     supabase_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     storage_bucket: str = os.getenv("STORAGE_BUCKET", "receipts")
+    redis_url: str = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    expected_account_number: str = os.getenv("ACCOUNT_NUMBER", "")
+    expected_amount: float = float(os.getenv("AMOUNT", "0"))
 
     # OCR Configuration
     reference_image: str = os.getenv("REFERENCE_IMAGE", "reference_receipt.jpg")
