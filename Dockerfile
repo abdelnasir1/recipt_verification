@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libgomp1 \
     libopenblas0 \
+    redis-server \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -34,12 +35,13 @@ COPY reference_receipt.jpg .
 
 # Copy application code
 COPY app/ ./app/
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN chown -R receipt:receipt /app
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh && chown -R receipt:receipt /app
 USER receipt
 
 
 EXPOSE 8000
 
-# Run with uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run Redis, the Celery worker, and the API in this container.
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
