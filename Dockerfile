@@ -22,6 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+# Run the service without root privileges.
+RUN groupadd --system receipt && useradd --system --gid receipt --home-dir /app receipt
+
 # Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -31,6 +34,9 @@ COPY reference_receipt.jpg .
 
 # Copy application code
 COPY app/ ./app/
+
+RUN chown -R receipt:receipt /app
+USER receipt
 
 
 EXPOSE 8000
